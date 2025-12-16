@@ -1,4 +1,4 @@
-import { ADD_TASK, UPDATE_TASK } from "../components/TaskForm";
+import { ADD_TASK, UPDATE_TASK } from "../redux/taskActions";
 
 
 export const initialState = {
