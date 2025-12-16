@@ -1,10 +1,11 @@
+import TaskForm from "./components/TaskForm";
 
 
 function App() {
 
   return (
     <>
-      Starter
+      <TaskForm/>
     </>
   )
 }

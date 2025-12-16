@@ -1,73 +1,138 @@
 import { useState } from 'react';
 
-const initialData = {
-  title: '',
-  description: '',
-  date: '',
-};
+export default function TaskFormManual() {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    date: '',
+  });
 
-export default function TaskForm() {
-  const [form, setForm] = useState(initialData);
+  const [errors, setErrors] = useState({});
+  const [tasks, setTasks] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.title) {
+      newErrors.title = 'Lütfen görev başlığını girin';
+    } else if (formData.title.length < 5) {
+      newErrors.title = 'Görev başlığı en az 5 karakter olmalıdır';
+    }
+
+    if (!formData.description) {
+      newErrors.description = 'Lütfen görev açıklamasını girin';
+    }
+
+    return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Task Data:', form);
-    setForm(initialData);
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    toast.success('Formunu başarıyla gönderildi!');
+    setTasks((prev) => [...prev, formData]);
+    setFormData({
+      title: '',
+      description: '',
+      date: '',
+    });
+    setErrors({});
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Görev Ekleme Formu</h2>
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 bg-white shadow-md rounded-lg"
+      >
+        <h2 className="text-xl font-bold mb-4">Görev Ekleme Formu</h2>
 
-      <div>
-        <label htmlFor="title">Başlık</label>
+        <div className="mb-1">
+          <label htmlFor="title">Başlık</label>
+          <br />
+          <input
+            className="w-full p-2 border rounded"
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Görev başlığı"
+          />
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+          )}
+        </div>
+
         <br />
-        <input
-          id="title"
-          type="text"
-          name="title"
-          value={form.title}
-          onChange={handleChange}
-          required
-        />
-      </div>
 
-      <br />
+        <div className="mb-1">
+          <label htmlFor="description">Açıklama</label>
+          <br />
+          <textarea
+            className="w-full p-2 border rounded"
+            rows={4}
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Görev açıklaması"
+          />
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+          )}
+        </div>
 
-      <div>
-        <label htmlFor="description">Açıklama</label>
         <br />
-        <textarea
-          id="description"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          rows={4}
-        />
-      </div>
 
-      <br />
+        <div className="mb-1">
+          <label htmlFor="date">Tarih</label>
+          <br />
+          <input
+            type="date"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
 
-      <div>
-        <label htmlFor="date">Tarih</label>
         <br />
-        <input
-          id="date"
-          type="date"
-          name="date"
-          value={form.date}
-          onChange={handleChange}
-        />
-      </div>
 
-      <br />
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+        >
+          Kaydet
+        </button>
+      </form>
 
-      <button type="submit">Kaydet</button>
-    </form>
+      <h2 className="text-xl font-bold mb-4 mt-4">Görevler</h2>
+      {tasks.length === 0 ? (
+        <p className="text-gray-500">Henüz eklenmiş bir görev yok!</p>
+      ) : (
+        <div>
+          {tasks.map((item, index) => (
+            <h3
+              key={index}
+              className="p-2 font-bold text-lg border rounded-lg shadow-sm bg-gray-50 mb-3"
+            >
+              {item.title}
+            </h3>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
