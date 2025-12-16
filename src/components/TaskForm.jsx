@@ -1,6 +1,12 @@
 import { set, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useReducer } from 'react';
+import { initialState, taskReducer } from '../reducer/taskReducer';
+
+
+export const ADD_TASK = 'ADD_TASK';
+export const UPDATE_TASK = 'UPDATE_TASK';
 
 const initialData = {
   title: '',
@@ -9,7 +15,9 @@ const initialData = {
 };
 
 export default function TaskFormRHF() {
-  const [tasks, setTasks] = useLocalStorage('gorevler', []);
+  //const [tasks, setTasks] = useLocalStorage('gorevler', []);
+
+  const [state, dispatch] = useReducer(taskReducer, initialState);
 
   const {
     register,
@@ -24,7 +32,14 @@ export default function TaskFormRHF() {
   const customHandleSubmit = (data) => {
     toast.success('Formunu başarıyla gönderildi!');
 
-    setTasks((currentState) => [...currentState, data]);
+    data.id = Math.ceil(Math.random() * 100 + 1);
+
+    dispatch({
+      type: ADD_TASK,
+      payload: data
+    })
+
+    //setTasks((currentState) => [...currentState, data]);
     reset();
   };
 
@@ -99,11 +114,11 @@ export default function TaskFormRHF() {
       </form>
 
       <h2 className="text-xl font-bold mb-4 mt-4">Görevler</h2>
-      {tasks.length === 0 ? (
+      {state.tasks.length === 0 ? (
         <p className="text-gray-500">Henüz eklenmiş bir görev yok!</p>
       ) : (
         <div>
-          {tasks.map((item, index) => (
+          {state.tasks.map((item, index) => (
             <h3
               key={index}
               className="p-2 font-bold text-lg border rounded-lg shadow-sm bg-gray-50 mb-3"
