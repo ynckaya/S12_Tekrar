@@ -1,62 +1,37 @@
-import { useState } from 'react';
+import { set, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
-export default function TaskFormManual() {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    date: '',
+const initialData = {
+  title: '',
+  description: '',
+  date: '',
+};
+
+export default function TaskFormRHF() {
+  const [tasks, setTasks] = useLocalStorage('gorevler', []);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: initialData,
+    mode: 'all',
   });
 
-  const [errors, setErrors] = useState({});
-  const [tasks, setTasks] = useState([]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const validate = () => {
-    const newErrors = {};
-
-    if (!formData.title) {
-      newErrors.title = 'Lütfen görev başlığını girin';
-    } else if (formData.title.length < 5) {
-      newErrors.title = 'Görev başlığı en az 5 karakter olmalıdır';
-    }
-
-    if (!formData.description) {
-      newErrors.description = 'Lütfen görev açıklamasını girin';
-    }
-
-    return newErrors;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
+  const customHandleSubmit = (data) => {
     toast.success('Formunu başarıyla gönderildi!');
-    setTasks((prev) => [...prev, formData]);
-    setFormData({
-      title: '',
-      description: '',
-      date: '',
-    });
-    setErrors({});
+
+    setTasks((currentState) => [...currentState, data]);
+    reset();
   };
 
   return (
     <>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(customHandleSubmit)}
         className="p-4 bg-white shadow-md rounded-lg"
       >
         <h2 className="text-xl font-bold mb-4">Görev Ekleme Formu</h2>
@@ -67,13 +42,17 @@ export default function TaskFormManual() {
           <input
             className="w-full p-2 border rounded"
             type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
+            {...register('title', {
+              required: 'Lütfen görev başlığını girin',
+              minLength: {
+                value: 5,
+                message: 'Görev başlığı en az 5 karakter olmalıdır',
+              },
+            })}
             placeholder="Görev başlığı"
           />
           {errors.title && (
-            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
           )}
         </div>
 
@@ -85,13 +64,15 @@ export default function TaskFormManual() {
           <textarea
             className="w-full p-2 border rounded"
             rows={4}
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Görev açıklaması"
+            {...register('description', {
+              required: 'Lütfen görev başlığını girin',
+            })}
+            placeholder={'Görev açıklaması'}
           />
           {errors.description && (
-            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.description.message}
+            </p>
           )}
         </div>
 
@@ -102,9 +83,7 @@ export default function TaskFormManual() {
           <br />
           <input
             type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
+            {...register('date')}
             className="w-full p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
         </div>
