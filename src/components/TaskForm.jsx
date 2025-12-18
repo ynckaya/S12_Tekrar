@@ -1,7 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
-import { addTask } from '../redux/taskActions';
+import { addTask, fetchTask } from '../redux/taskActions';
+import { useEffect } from 'react';
 
 const initialData = {
   title: '',
@@ -12,7 +13,7 @@ const initialData = {
 export default function TaskFormRHF() {
   //const [state, dispatch] = useReducer(taskReducer, initialState);
 
-  const tasks = useSelector(store => store.taskR.tasks);
+  const {tasks, loading, error} = useSelector(store => store.taskR);
 
   const dispatch = useDispatch();
 
@@ -25,6 +26,10 @@ export default function TaskFormRHF() {
     defaultValues: initialData,
     mode: 'all',
   });
+
+  useEffect(() => {
+    dispatch(fetchTask());
+  }, []);
 
   const customHandleSubmit = (data) => {
     toast.success('Formunu başarıyla gönderildi!');
@@ -99,6 +104,8 @@ export default function TaskFormRHF() {
       </form>
 
       <h2 className="text-xl font-bold mb-4 mt-4">Görevler</h2>
+      {loading && <p className="text-gray-500 text-sm mt-1">Yükleniyor...</p>}
+      {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
       {tasks.length === 0 ? (
         <p className="text-gray-500">Henüz eklenmiş bir görev yok!</p>
       ) : (
