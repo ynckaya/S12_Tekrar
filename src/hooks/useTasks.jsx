@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTaskApi, fetchTaskApi } from "../api/taskApi";
-import { error } from "console";
 
 
 export const useTasks = () => {

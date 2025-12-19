@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { addTask, fetchTask } from '../redux/taskActions';
 import { useEffect } from 'react';
-import { useCreateTask, useTasks } from '../hooks/useTasks';
+import { useTaskContext } from '../context/TaskContext';
 
 const initialData = {
   title: '',
@@ -12,9 +12,8 @@ const initialData = {
 };
 
 export default function TaskFormRHF() {
-  const { tasks, isLoading, error} = useTasks();
 
-  const {data, isError, isLoadingM, mutate} = useCreateTask();
+  const {gorevler, loading, error} = useTaskContext();
 
   const dispatch = useDispatch();
 
@@ -107,13 +106,13 @@ export default function TaskFormRHF() {
       </form>
 
       <h2 className="text-xl font-bold mb-4 mt-4">Görevler</h2>
-      {isLoading && <p className="text-gray-500 text-sm mt-1">Yükleniyor...</p>}
+      {loading && <p className="text-gray-500 text-sm mt-1">Yükleniyor...</p>}
       {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
-      {tasks.length === 0 ? (
+      {gorevler.length === 0 ? (
         <p className="text-gray-500">Henüz eklenmiş bir görev yok!</p>
       ) : (
         <div>
-          {tasks.map((item, index) => (
+          {gorevler.map((item, index) => (
             <h3
               key={index}
               className="p-2 font-bold text-lg border rounded-lg shadow-sm bg-gray-50 mb-3"

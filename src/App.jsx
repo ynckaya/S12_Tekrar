@@ -1,12 +1,15 @@
 import TaskForm from "./components/TaskForm";
+import { TaskProvider } from "./context/TaskContext";
 
 
 function App() {
 
   return (
-    <div className="container">
-      <TaskForm/>
-    </div>
+    <TaskProvider> 
+      <div className="container">
+        <TaskForm/>
+      </div>
+    </TaskProvider>
   )
 }
 
